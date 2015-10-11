@@ -4,7 +4,7 @@ namespace backend\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use common\models\LoginForm;
+use app\models\LoginForm;
 use yii\filters\VerbFilter;
 
 /**
@@ -22,7 +22,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['login', 'captcha', 'error'],
                         'allow' => true,
                     ],
                     [
@@ -50,12 +50,18 @@ class SiteController extends Controller
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
+            'captcha'=> [
+                'class'=>'yii\captcha\CaptchaAction',
+                'backColor'=>0xFFFFFF,
+                'maxLength'=>4,
+                'minLength'=>4,
+            ],
         ];
     }
 
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->renderPartial('index');
     }
 
     public function actionLogin()
@@ -68,7 +74,7 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         } else {
-            return $this->render('login', [
+            return $this->renderPartial('login', [
                 'model' => $model,
             ]);
         }
@@ -79,9 +85,5 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
-    }
-
-    public function actionSay($message= 'Hello World'){
-    	return $this->render('say', ['message' => $message]);
     }
 }
