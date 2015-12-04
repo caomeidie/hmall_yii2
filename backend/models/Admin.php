@@ -30,6 +30,9 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 1;
+    private $password_hash;
+    private $password_reset_token;
+    private $auth_key;
     
     /**
      * @inheritdoc
@@ -54,12 +57,12 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return [
             [['admin_name', 'password'], 'required'],
-            [['logintimes', 'status', 'style_id'], 'integer'],
+            /*[['logintimes', 'status', 'style_id'], 'integer'],
             [['admin_name', 'email', 'phone'], 'string', 'max' => 50],
             [['password'], 'string', 'max' => 64],
             [['addtime', 'updatetime', 'lastip'], 'string', 'max' => 20],
             [['admin_name', 'phone'], 'unique', 'targetAttribute' => ['admin_name', 'phone'], 'message' => 'The combination of Admin Name and Phone has already been taken.']
-        ];
+        */];
     }
 
     /**
@@ -72,13 +75,13 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             'admin_name' => 'Admin Name',
             'password' => 'Password',
             'email' => 'Email',
-            'phone' => 'Phone',
+            /*'phone' => 'Phone',
             'addtime' => 'Addtime',
             'updatetime' => 'Updatetime',
             'logintimes' => 'Logintimes',
             'lastip' => 'Lastip',
             'status' => 'Status',
-            'style_id' => 'Style ID',
+            'style_id' => 'Style ID',*/
         ];
     }
     
@@ -89,9 +92,19 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
-        return [
+        /*return [
                 'AdminStyle'=>[self::BELONGS_TO, 'AdminStyle', 'style_id'],
-        ];
+        ];*/
+    }
+
+    /**
+     * Generates password hash from password and sets it to the model
+     *
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
     
     /**
@@ -241,15 +254,6 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
     
-    /**
-     * Generates password hash from password and sets it to the model
-     *
-     * @param string $password
-     */
-    public function setPassword($password)
-    {
-        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
-    }
     
     /**
      * Generates "remember me" authentication key
